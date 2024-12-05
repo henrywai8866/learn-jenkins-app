@@ -38,6 +38,12 @@ pipeline {
                     npm test
                 '''
             }
+
+            post {
+                always {
+                    junit 'test-results/junit.xml'
+                }
+            }
         }
 
         stage('E2E') {
@@ -52,9 +58,14 @@ pipeline {
                 sh 'npm install'
                 sh 'node_modules/.bin/serve -s build &'
                 sh 'sleep 10'
-                sh 'npx playwright test'
+                sh 'npx playwright test --reporter=html'
+            }
+
+            post {
+                always {
+                    publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'playwright-report', reportFiles: 'index.html', reportName: 'Playwright HTML Report', reportTitles: '', useWrapperFileDirectly: true])
+                }
             }
         }
     }
 }
-
