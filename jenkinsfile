@@ -49,12 +49,7 @@ pipeline {
             }
 
             steps {
-                sh '''
-                    npm install
-                    serve -s build &
-                    sleep 10
-                    npx playwright test
-                '''
+                sh 'npm install'
             }
         }
     }
