@@ -74,11 +74,10 @@ pipeline {
                     }
 
                     steps {
-                        sh '''
-                            serve -s build &
-                            sleep 10
-                            npx playwright test  --reporter=html
-                        '''
+                        sh 'npm install'
+                        sh 'node_modules/.bin/serve -s build &'
+                        sh 'sleep 10'
+                        sh 'npx playwright test --reporter=html'
                     }
 
                     post {
@@ -103,14 +102,13 @@ pipeline {
             }
 
             steps {
-                sh '''
-                    netlify --version
-                    echo "Deploying to staging. Site ID: $NETLIFY_SITE_ID"
-                    netlify status
-                    netlify deploy --dir=build --json > deploy-output.json
-                    CI_ENVIRONMENT_URL=$(jq -r '.deploy_url' deploy-output.json)
-                    npx playwright test  --reporter=html
-                '''
+                sh 'npm install'
+                sh 'node_modules/.bin/netlify --version'
+                sh 'echo "Deploying to staging. Site ID: $NETLIFY_SITE_ID"'
+                sh 'node_modules/.bin/netlify status'
+                sh 'node_modules/.bin/netlify deploy --dir=build --json > deploy-output.json'
+                sh 'CI_ENVIRONMENT_URL=$(node_modules/.bin/node-jq -r ".deploy_url" deploy-output.json)'
+                sh 'npx playwright test  --reporter=html'
             }
 
             post {
@@ -133,14 +131,13 @@ pipeline {
             }
 
             steps {
-                sh '''
-                    node --version
-                    netlify --version
-                    echo "Deploying to production. Site ID: $NETLIFY_SITE_ID"
-                    netlify status
-                    netlify deploy --dir=build --prod
-                    npx playwright test  --reporter=html
-                '''
+                sh 'node --version'
+                sh 'npm install'
+                sh 'node_modules/.bin/netlify --version'
+                sh 'echo "Deploying to production. Site ID: $NETLIFY_SITE_ID"'
+                sh 'node_modules/.bin/netlify status'
+                sh 'node_modules/.bin/netlify deploy --dir=build --prod'
+                sh 'npx playwright test  --reporter=html'
             }
 
             post {
